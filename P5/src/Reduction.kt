@@ -20,7 +20,7 @@ private fun sovlePart2(inputCharList: List<Char>) {
     val fullyReactedTestMap = ('a'..'z').toList().map { charToTest ->
         inputCharList
                 .filterNot { charToFilter -> charEqualIgnoreCase(charToFilter, charToTest) }
-                .fold(LinkedList<Char>(), { acc, c -> react(acc, c) }).size
+                .fold(Stack<Char>(), { acc, c -> react(acc, c) }).size
     }
     val shortesPolymer = fullyReactedTestMap.sorted().first()
 
@@ -29,16 +29,15 @@ private fun sovlePart2(inputCharList: List<Char>) {
 }
 
 private fun solvePart1(inputCharList: List<Char>) {
-    val unitList = inputCharList.fold(LinkedList<Char>(), { acc, c -> react(acc, c) })
+    val unitList = inputCharList.fold(Stack<Char>(), { acc, c -> react(acc, c) })
     println("part 1: " + unitList.size)
 }
 
-private fun react(list: LinkedList<Char>, c: Char): LinkedList<Char> {
-    val last = list.peekLast()
-    if (last != null && react(last, c)) {
-        list.removeLast()
+private fun react(list: Stack<Char>, c: Char): Stack<Char> {
+    if (list.empty().not() && react(list.peek(), c)) {
+        list.pop()
     } else {
-        list.add(c)
+        list.push(c)
     }
     return list
 }
