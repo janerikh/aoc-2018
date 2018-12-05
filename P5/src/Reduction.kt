@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
             .readLines()
 
     // part 1
-    val line = lines.get(0)
+    val line = lines[0]
 
     val inputCharList = line.toCharArray().toList()
     solvePart1(inputCharList)
@@ -20,16 +20,16 @@ private fun sovlePart2(inputCharList: List<Char>) {
     val fullyReactedTestMap = ('a'..'z').toList().map { charToTest ->
         inputCharList
                 .filterNot { charToFilter -> charEqualIgnoreCase(charToFilter, charToTest) }
-                .fold(Stack<Char>(), { acc, c -> react(acc, c) }).size
+                .fold(Stack<Char>()) { acc, c -> react(acc, c) }.size
     }
-    val shortesPolymer = fullyReactedTestMap.sorted().first()
+    val shortestPolymer = fullyReactedTestMap.sorted().first()
 
     // 4552
-    println("part 2: $shortesPolymer")
+    println("part 2: $shortestPolymer")
 }
 
 private fun solvePart1(inputCharList: List<Char>) {
-    val unitList = inputCharList.fold(Stack<Char>(), { acc, c -> react(acc, c) })
+    val unitList = inputCharList.fold(Stack<Char>()) { acc, c -> react(acc, c) }
     println("part 1: " + unitList.size)
 }
 
@@ -43,6 +43,6 @@ private fun react(list: Stack<Char>, c: Char): Stack<Char> {
 }
 
 private fun react(last: Char, c: Char) =
-        charEqualIgnoreCase(last, c) && !last.equals(c)
+        charEqualIgnoreCase(last, c) && last != c
 
-private fun charEqualIgnoreCase(c1: Char, c2: Char) = c1.toUpperCase().equals(c2.toUpperCase())
+private fun charEqualIgnoreCase(c1: Char, c2: Char) = c1.toUpperCase() == c2.toUpperCase()
