@@ -40,39 +40,65 @@ private fun solve(input: String, factor: Int): MutableList<Long> {
         throw RuntimeException("No match for regex")
     }
     val maxPlayers = matchResult.groupValues[1].toInt()
-    val lastMarbleNumber: Long = matchResult.groupValues[2].toLong()
+    val lastMarbleNumber = matchResult.groupValues[2].toLong()
 
-    val circle = mutableListOf(0L)
+    val ring = Ring(0L)
 
     val playersScore = (1..maxPlayers).map { 0L }.toMutableList()
     var currentPlayer = 1
-    var marbleNumber: Long = 1
-    var currentIndex = 0
-    val totalLastMarble: Long = lastMarbleNumber * factor
-    while (marbleNumber <= totalLastMarble) {
-//        println("currentPlayer: $currentPlayer marbleNumber: $marbleNumber size: ${circle.size} circle: $circle currentIndex: $currentIndex")
+    val totalLastMarble = lastMarbleNumber * factor
+    for (marbleNumber in 1..totalLastMarble) {
 
         if (marbleNumber % 23 == 0L) {
+            ring.move(-7)
             playersScore[currentPlayer - 1] += marbleNumber
-            var indexToRemove = (currentIndex - 7)
-            if (indexToRemove < 0) {
-                indexToRemove = circle.size + indexToRemove
-            }
-//            println("index to remove: $indexToRemove") //6
-            val marbleRemoved = circle.removeAt(indexToRemove)
-            playersScore[currentPlayer - 1] += marbleRemoved
-            currentIndex = indexToRemove
+            playersScore[currentPlayer - 1] += ring.delete()
         } else {
-            currentIndex = (currentIndex + 2) % circle.size
-            if (currentIndex == 0) {
-                currentIndex = circle.size
-            }
-//        println("new currentIndex: $currentIndex size: ${circle.size} circle: $circle")
-            circle.add(currentIndex, marbleNumber)
+            ring.move(1)
+            ring.insert(marbleNumber)
         }
         currentPlayer = currentPlayer.rem(maxPlayers) + 1
-        marbleNumber++
-//        println()
     }
     return playersScore
+}
+
+private class Ring<T>(element: T) {
+    private var root = Node(element)
+
+    fun insert(element: T) {
+        root = Node(element, root, root.right)
+    }
+
+    fun delete(): T {
+        require(root.left != root && root.right != root)
+        val element = root.element
+        root.left.right = root.right
+        root.right.left = root.left
+        root = root.right
+        return element
+    }
+
+    fun move(n: Int) {
+        if (n < 0) repeat(-n) { root = root.left } else repeat(n) { root = root.right }
+    }
+
+    private class Node<T> {
+        var element: T
+        var left: Node<T>
+        var right: Node<T>
+
+        constructor(element: T) {
+            this.element = element
+            left = this
+            right = this
+        }
+
+        constructor(element: T, left: Node<T>, right: Node<T>) {
+            this.element = element
+            this.left = left
+            left.right = this
+            this.right = right
+            right.left = this
+        }
+    }
 }
